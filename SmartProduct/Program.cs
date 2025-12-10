@@ -1,11 +1,9 @@
 using SmartProduct.Services;
+using SmartProduct.Agents;
 using SmartProduct.Configuration;
 using System.Reflection;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.Extensions.AI;
 using Azure.AI.OpenAI;
-using OpenAI.Embeddings;
+using Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,76 +21,69 @@ var azureOpenAISettings = builder.Configuration
 
 builder.Services.AddSingleton(azureOpenAISettings);
 
-// Configure Semantic Kernel with MAF
+// Configure Microsoft Agent Framework with Azure OpenAI
 if (azureOpenAISettings.IsConfigured)
 {
-    Console.WriteLine("? Azure OpenAI configured - Initializing MAF with Semantic Kernel...");
+    Console.WriteLine("? Azure OpenAI configured - Initializing Microsoft Agent Framework (.NET 9)...");
     
-    // Register Semantic Kernel with Azure OpenAI
-    builder.Services.AddSingleton<Kernel>(sp =>
+    // Register Azure OpenAI Client
+    builder.Services.AddSingleton<AzureOpenAIClient>(sp =>
     {
-        var kernelBuilder = Kernel.CreateBuilder();
-        
-        // Add Azure OpenAI Chat Completion
-        kernelBuilder.AddAzureOpenAIChatCompletion(
-            deploymentName: azureOpenAISettings.DeploymentName,
-            endpoint: azureOpenAISettings.Endpoint,
-            apiKey: azureOpenAISettings.ApiKey);
-        
-        // Add logging
-        kernelBuilder.Services.AddLogging(loggingBuilder =>
-        {
-            loggingBuilder.AddConsole();
-            loggingBuilder.SetMinimumLevel(LogLevel.Information);
-        });
-        
-        return kernelBuilder.Build();
-    });
-    
-    // Register Embedding Generator using Azure OpenAI client
-    builder.Services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(sp =>
-    {
-        var client = new AzureOpenAIClient(
+        return new AzureOpenAIClient(
             new Uri(azureOpenAISettings.Endpoint),
-            new Azure.AzureKeyCredential(azureOpenAISettings.ApiKey));
-        
-        var embeddingClient = client.GetEmbeddingClient(azureOpenAISettings.EmbeddingDeploymentName);
-        return new OpenAIEmbeddingGeneratorAdapter(embeddingClient);
+            new AzureKeyCredential(azureOpenAISettings.ApiKey));
     });
     
-    // Register MAF-based Recommendation Agent
-    builder.Services.AddScoped<IRecommendationAgent>(sp => 
-        new RecommendationAgent(
+    // Register the Product Recommendation Agent
+    builder.Services.AddScoped<ProductRecommendationAgent>(sp => 
+        new ProductRecommendationAgent(
             sp.GetRequiredService<IProductCatalog>(),
-            sp.GetRequiredService<ILogger<RecommendationAgent>>(),
-            sp.GetRequiredService<Kernel>(),
-            sp.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>()));
+            sp.GetRequiredService<ILogger<ProductRecommendationAgent>>(),
+            sp.GetRequiredService<AzureOpenAIClient>(),
+            azureOpenAISettings.DeploymentName,
+            azureOpenAISettings.EmbeddingDeploymentName));
     
-    // Keep backward compatibility with old interface
+    // Register adapter for backward compatibility
+    builder.Services.AddScoped<IRecommendationAgent>(sp => 
+        new AgentBasedRecommendationService(
+            sp.GetRequiredService<ProductRecommendationAgent>(),
+            sp.GetRequiredService<ILogger<AgentBasedRecommendationService>>()));
+    
     builder.Services.AddScoped<IRecommendationService>(sp => 
-        new RecommendationServiceAdapter(sp.GetRequiredService<IRecommendationAgent>()));
+        sp.GetRequiredService<IRecommendationAgent>() as IRecommendationService 
+        ?? new RecommendationServiceAdapter(sp.GetRequiredService<IRecommendationAgent>()));
     
-    Console.WriteLine("? MAF initialized successfully with Azure OpenAI integration");
+    Console.WriteLine("? Microsoft Agent Framework initialized successfully");
+    Console.WriteLine("   - Agent: ProductRecommendationAgent");
+    Console.WriteLine("   - Framework: Microsoft.Agents.AI.OpenAI v1.0.0-preview");
+    Console.WriteLine("   - AI Model: Azure OpenAI " + azureOpenAISettings.DeploymentName);
+    Console.WriteLine("   - Embeddings: " + azureOpenAISettings.EmbeddingDeploymentName);
 }
 else
 {
-    Console.WriteLine("? Azure OpenAI NOT configured - Using fallback semantic search");
+    Console.WriteLine("?? Azure OpenAI NOT configured - Using fallback semantic search");
     Console.WriteLine("  Configure AzureOpenAI settings in appsettings.json to enable AI features");
     
     // Register agent without AI capabilities
-    builder.Services.AddScoped<IRecommendationAgent>(sp =>
+    builder.Services.AddScoped<ProductRecommendationAgent>(sp =>
     {
-        var kernel = Kernel.CreateBuilder().Build(); // Empty kernel
-        return new RecommendationAgent(
+        return new ProductRecommendationAgent(
             sp.GetRequiredService<IProductCatalog>(),
-            sp.GetRequiredService<ILogger<RecommendationAgent>>(),
-            kernel,
-            embeddingGenerator: null);
+            sp.GetRequiredService<ILogger<ProductRecommendationAgent>>(),
+            azureClient: null,
+            chatDeployment: null,
+            embeddingDeployment: null);
     });
     
-    // Keep backward compatibility
+    // Register adapter for backward compatibility
+    builder.Services.AddScoped<IRecommendationAgent>(sp => 
+        new AgentBasedRecommendationService(
+            sp.GetRequiredService<ProductRecommendationAgent>(),
+            sp.GetRequiredService<ILogger<AgentBasedRecommendationService>>()));
+    
     builder.Services.AddScoped<IRecommendationService>(sp => 
-        new RecommendationServiceAdapter(sp.GetRequiredService<IRecommendationAgent>()));
+        sp.GetRequiredService<IRecommendationAgent>() as IRecommendationService 
+        ?? new RecommendationServiceAdapter(sp.GetRequiredService<IRecommendationAgent>()));
 }
 
 var app = builder.Build();

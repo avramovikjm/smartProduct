@@ -1,31 +1,55 @@
-# MAF Implementation Summary
+# Semantic Kernel Agents Framework Implementation
 
-## ? Completed Implementation
+## ? Completed Migration to .NET 9
 
-### 1. **Microsoft AI Framework (MAF) Integration**
+### 1. **Semantic Kernel Agents Framework Integration**
 
-Successfully integrated MAF using Semantic Kernel with the following components:
+Successfully migrated to **.NET 9** with the **official Semantic Kernel Agents Framework** using the following components:
 
-#### Core MAF Components Added:
+#### Core Semantic Kernel Agents Components:
 
-1. **Semantic Kernel** (`Microsoft.SemanticKernel` v1.68.0)
+1. **Semantic Kernel Core** (`Microsoft.SemanticKernel` v1.68.0)
    - AI orchestration framework
    - Kernel configured with Azure OpenAI chat completion
    - Registered as singleton in DI container
 
-2. **Azure OpenAI Connectors** (`Microsoft.SemanticKernel.Connectors.OpenAI` v1.68.0)
+2. **Semantic Kernel Agents Framework** (NEW!)
+   - `Microsoft.SemanticKernel.Agents.Abstractions` v1.68.0
+   - `Microsoft.SemanticKernel.Agents.Core` v1.68.0
+   - Official Microsoft agent patterns and abstractions
+   - ChatCompletionAgent for structured AI conversations
+
+3. **Azure OpenAI Connectors** (`Microsoft.SemanticKernel.Connectors.OpenAI` v1.68.0)
    - Chat completion for LLM-based ranking
    - Embedding generation for semantic search
 
-3. **Microsoft.Extensions.AI** (v10.0.1)
+4. **Microsoft.Extensions.AI** (v10.0.1)
    - Modern AI abstractions
    - `IEmbeddingGenerator<string, Embedding<float>>` interface
 
-4. **Azure OpenAI SDK** (`Azure.AI.OpenAI` v2.7.0-beta.2)
+5. **Azure OpenAI SDK** (`Azure.AI.OpenAI` v2.7.0-beta.2)
    - Latest Azure OpenAI client
    - Support for GPT-4o and text-embedding-3-small
 
-### 2. **New Files Created**
+### 2. **New Files Created (.NET 9 Migration)**
+
+#### Agents (NEW!)
+- **`Agents/ProductRecommendationAgent.cs`** ??
+  - **Official Semantic Kernel Agents Framework implementation**
+  - Uses `ChatCompletionAgent` from SK Agents
+  - Features:
+    - Agent-based conversation patterns
+    - Vector embeddings using Azure OpenAI
+    - Cosine similarity for semantic search
+    - LLM-based product ranking with agent instructions
+    - Contextual explanations generation
+    - Fallback mode without AI
+    - Kernel function registration for tool calling
+
+- **`Services/AgentBasedRecommendationService.cs`** (NEW!)
+  - Adapter wrapping ProductRecommendationAgent
+  - Maintains backward compatibility with IRecommendationAgent
+  - Implements both IRecommendationAgent and IRecommendationService
 
 #### Configuration
 - **`Configuration/AzureOpenAISettings.cs`**
@@ -33,15 +57,10 @@ Successfully integrated MAF using Semantic Kernel with the following components:
   - Validates Azure OpenAI settings
   - Properties: Endpoint, ApiKey, DeploymentName, EmbeddingDeploymentName
 
-#### Services
-- **`Services/RecommendationAgent.cs`** ?
-  - **Main MAF-based agent implementation**
-  - Features:
-    - Vector embeddings using Azure OpenAI
-    - Cosine similarity for semantic search
-    - LLM-based product ranking
-    - Contextual explanations generation
-    - Fallback mode without AI
+#### Services (Legacy - Still Supported)
+- **`Services/RecommendationAgent.cs`**
+  - Legacy implementation (pre-agents framework)
+  - Still available for reference
 
 - **`Services/OpenAIEmbeddingGeneratorAdapter.cs`**
   - Adapts OpenAI `EmbeddingClient` to Microsoft.Extensions.AI
@@ -104,16 +123,30 @@ Successfully integrated MAF using Semantic Kernel with the following components:
 - Comprehensive logging with ILogger
 - Try-catch for AI failures
 
-### 5. **Package Dependencies**
+### 5. **Package Dependencies (.NET 9)**
 
 ```xml
+<!-- Target Framework -->
+<TargetFramework>net9.0</TargetFramework>
+
+<!-- Semantic Kernel Core -->
 <PackageReference Include="Microsoft.SemanticKernel" Version="1.68.0" />
 <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.68.0" />
+
+<!-- Semantic Kernel Agents Framework (NEW!) -->
+<PackageReference Include="Microsoft.SemanticKernel.Agents.Abstractions" Version="1.68.0" />
+<PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.68.0" />
+
+<!-- Azure OpenAI -->
 <PackageReference Include="Azure.AI.OpenAI" Version="2.7.0-beta.2" />
 <PackageReference Include="Azure.Identity" Version="1.13.1" />
-<PackageReference Include="System.Text.Json" Version="10.0.0" />
-<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+
+<!-- ASP.NET Core (.NET 9) -->
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
 <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+
+<!-- System -->
+<PackageReference Include="System.Text.Json" Version="10.0.0" />
 ```
 
 ### 6. **How to Use**

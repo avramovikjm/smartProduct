@@ -2,40 +2,57 @@
 
 ## Overview
 
-SmartProduct is a modern ASP.NET Core 8.0 Web API that provides intelligent product recommendations using **Microsoft AI Framework (MAF)** with **Semantic Kernel** and **Azure OpenAI**.
+SmartProduct is a modern **ASP.NET Core 9.0** Web API that provides intelligent product recommendations using the **official Semantic Kernel Agents Framework** with **Azure OpenAI**.
+
+## ?? .NET 9 + Semantic Kernel Agents Framework
+
+This project now uses:
+- ? **.NET 9** - Latest .NET framework
+- ? **Semantic Kernel Agents Framework** - Official Microsoft agent patterns
+- ? **ChatCompletionAgent** - Structured AI conversations
+- ? **Azure OpenAI** - GPT-4o and embeddings integration
 
 ## Architecture
 
-### MAF Integration
+### Semantic Kernel Agents Framework
 
-This project implements the **Microsoft AI Framework (MAF)** pattern with the following components:
+This project implements the **official Semantic Kernel Agents Framework** pattern with the following components:
 
-1. **Semantic Kernel** - AI orchestration framework for managing AI services
-2. **Azure OpenAI** - LLM for intelligent ranking and explanations
-3. **Text Embeddings** - Semantic search using vector embeddings
-4. **Agent Pattern** - `RecommendationAgent` implements AI-driven recommendations
+1. **Semantic Kernel Core** - AI orchestration framework for managing AI services
+2. **Semantic Kernel Agents** - Official agent patterns and abstractions
+3. **ChatCompletionAgent** - Structured AI conversations with instructions
+4. **Azure OpenAI** - LLM for intelligent ranking and explanations
+5. **Text Embeddings** - Semantic search using vector embeddings
+6. **Agent Pattern** - `ProductRecommendationAgent` implements official SK agent patterns
 
 ### Key Components
 
-#### 1. RecommendationAgent (`Services/RecommendationAgent.cs`)
-- **MAF-based agent** using Semantic Kernel
-- Implements `IRecommendationAgent` interface
+#### 1. ProductRecommendationAgent (`Agents/ProductRecommendationAgent.cs`) ??
+- **Official Semantic Kernel Agents Framework implementation**
+- Uses `ChatCompletionAgent` for structured AI conversations
+- Implements agent pattern with instructions and kernel functions
 - Features:
   - **Vector embeddings** for semantic product search
-  - **LLM-based ranking** for intelligent product recommendations
+  - **LLM-based ranking** with agent instructions
+  - **Kernel function registration** for tool calling
   - **Fallback mode** when AI is not configured
   - Cosine similarity for finding relevant products
 
-#### 2. Configuration (`Configuration/AzureOpenAISettings.cs`)
+#### 2. AgentBasedRecommendationService (`Services/AgentBasedRecommendationService.cs`)
+- Adapter wrapping ProductRecommendationAgent
+- Maintains backward compatibility with `IRecommendationAgent` and `IRecommendationService`
+- Provides seamless integration with existing controllers
+
+#### 3. Configuration (`Configuration/AzureOpenAISettings.cs`)
 - Centralized Azure OpenAI configuration
 - Settings loaded from `appsettings.json`
 - Validates configuration completeness
 
-#### 3. Embedding Generator Adapter (`Services/OpenAIEmbeddingGeneratorAdapter.cs`)
+#### 4. Embedding Generator Adapter (`Services/OpenAIEmbeddingGeneratorAdapter.cs`)
 - Adapts OpenAI `EmbeddingClient` to Microsoft.Extensions.AI interface
-- Enables use of Azure OpenAI embeddings with MAF
+- Enables use of Azure OpenAI embeddings with Semantic Kernel
 
-#### 4. Product Catalog (`Services/ProductCatalog.cs`)
+#### 5. Product Catalog (`Services/ProductCatalog.cs`)
 - Loads products from JSON data file
 - Provides product filtering capabilities
 
@@ -64,13 +81,15 @@ This project implements the **Microsoft AI Framework (MAF)** pattern with the fo
 
 ## How It Works
 
-### With AI Enabled (MAF Mode)
+### With AI Enabled (Semantic Kernel Agents Mode)
 
 1. **Query received** ? User sends natural language query
-2. **Generate embeddings** ? Query converted to vector using Azure OpenAI
-3. **Vector search** ? Products compared using cosine similarity
-4. **LLM ranking** ? GPT model ranks and explains recommendations
-5. **Return results** ? Structured recommendations with explanations
+2. **Agent initialization** ? ProductRecommendationAgent with ChatCompletionAgent
+3. **Generate embeddings** ? Query converted to vector using Azure OpenAI
+4. **Vector search** ? Products compared using cosine similarity
+5. **Agent invocation** ? ChatCompletionAgent ranks and explains using agent instructions
+6. **LLM ranking** ? GPT model ranks and explains recommendations
+7. **Return results** ? Structured recommendations with explanations
 
 ### Fallback Mode (No AI)
 
@@ -108,14 +127,17 @@ This project implements the **Microsoft AI Framework (MAF)** pattern with the fo
 
 ## Dependencies
 
-### NuGet Packages
+### NuGet Packages (.NET 9)
 
-- **Microsoft.SemanticKernel** (1.68.0) - Core MAF orchestration
+- **Microsoft.SemanticKernel** (1.68.0) - Core AI orchestration
 - **Microsoft.SemanticKernel.Connectors.OpenAI** (1.68.0) - Azure OpenAI integration
+- **Microsoft.SemanticKernel.Agents.Abstractions** (1.68.0) - Agent patterns (NEW!)
+- **Microsoft.SemanticKernel.Agents.Core** (1.68.0) - Agent implementation (NEW!)
 - **Azure.AI.OpenAI** (2.7.0-beta.2) - OpenAI client library
 - **Azure.Identity** (1.13.1) - Azure authentication
 - **Microsoft.Extensions.AI** (10.0.1) - AI abstractions
 - **System.Text.Json** (10.0.0) - JSON serialization
+- **Microsoft.AspNetCore.OpenApi** (9.0.0) - ASP.NET Core OpenAPI (.NET 9)
 
 ## Running the Application
 
@@ -153,61 +175,80 @@ curl -X POST https://localhost:5001/api/recommend \
 
 ## Operational Modes
 
-### ? AI Mode (MAF with Azure OpenAI)
+### ? AI Mode (Semantic Kernel Agents with Azure OpenAI)
 When Azure OpenAI is configured:
+- **ChatCompletionAgent** with structured instructions
 - Vector-based semantic search
 - LLM-powered ranking and explanations
+- Agent-managed conversations
 - High-quality, context-aware recommendations
 
-### ? Fallback Mode
+### ?? Fallback Mode
 When Azure OpenAI is NOT configured:
 - Hash-based text embeddings
 - Rule-based ranking
 - Basic but functional recommendations
+- Agent still initialized (without AI capabilities)
 
 ## Features
 
+? **Official Semantic Kernel Agents Framework** - Uses Microsoft's agent patterns  
+? **ChatCompletionAgent** - Structured AI conversations with instructions  
+? **.NET 9** - Latest framework with performance improvements  
 ? **Semantic Search** - Understands intent, not just keywords  
 ? **AI-Powered Ranking** - Intelligent product ordering  
 ? **Contextual Explanations** - Why each product is recommended  
+? **Kernel Functions** - Pluggable tool calling capabilities  
 ? **Graceful Degradation** - Works without AI configuration  
 ? **Swagger/OpenAPI** - Interactive API documentation  
 ? **Structured Logging** - Comprehensive logging with ILogger  
 ? **Dependency Injection** - Clean architecture with DI  
+? **Backward Compatible** - Existing APIs unchanged
 
 ## Project Structure
 
 ```
 SmartProduct/
+??? Agents/                         # NEW: Semantic Kernel Agents ??
+?   ??? ProductRecommendationAgent.cs # ChatCompletionAgent implementation
 ??? Configuration/
-?   ??? AzureOpenAISettings.cs       # Azure OpenAI settings
+?   ??? AzureOpenAISettings.cs      # Azure OpenAI settings
 ??? Controllers/
-?   ??? RecommendController.cs       # API endpoint
+?   ??? RecommendController.cs      # API endpoint
 ??? Data/
-?   ??? products.json                # Product catalog
+?   ??? products.json               # Product catalog
 ??? Models/
-?   ??? Product.cs                   # Product entity
+?   ??? Product.cs                  # Product entity
 ??? Services/
-?   ??? IRecommendationAgent.cs      # Agent interface
-?   ??? RecommendationAgent.cs       # MAF-based agent ?
-?   ??? IRecommendationService.cs    # Legacy interface
-?   ??? RecommendationService.cs     # Legacy implementation
+?   ??? IRecommendationAgent.cs     # Agent interface
+?   ??? AgentBasedRecommendationService.cs # NEW: Agent adapter
+?   ??? RecommendationAgent.cs      # Legacy implementation
+?   ??? IRecommendationService.cs   # Legacy interface
+?   ??? RecommendationService.cs    # Legacy implementation
 ?   ??? RecommendationServiceAdapter.cs # Adapter pattern
 ?   ??? OpenAIEmbeddingGeneratorAdapter.cs # Embedding adapter
-?   ??? IProductCatalog.cs           # Catalog interface
-?   ??? ProductCatalog.cs            # Catalog implementation
-??? Program.cs                       # DI & Kernel setup ?
-??? appsettings.json                 # Configuration
-??? README.md                        # This file
+?   ??? IProductCatalog.cs          # Catalog interface
+?   ??? ProductCatalog.cs           # Catalog implementation
+??? Program.cs                      # DI & Kernel setup with Agents
+??? SmartProduct.csproj             # .NET 9 project file
+??? appsettings.json                # Configuration
+??? README.md                       # This file
+??? MAF_IMPLEMENTATION.md           # Implementation details
 ```
 
-## MAF Benefits
+## Semantic Kernel Agents Framework Benefits
 
-1. **Standardized AI Integration** - Consistent patterns across Microsoft AI services
-2. **Semantic Kernel Orchestration** - Powerful AI workflow management
-3. **Extensibility** - Easy to add new AI capabilities
-4. **Testability** - Clear abstractions for unit testing
-5. **Modern Architecture** - Following Microsoft's recommended practices
+1. **Official Microsoft Patterns** - Using the official SK Agents Framework
+2. **ChatCompletionAgent** - Structured AI conversations with instructions
+3. **Agent Abstractions** - Clear agent lifecycle and patterns
+4. **Standardized AI Integration** - Consistent patterns across Microsoft AI services
+5. **Semantic Kernel Orchestration** - Powerful AI workflow management
+6. **Kernel Functions** - Tool calling and function invocation
+7. **Multi-Agent Ready** - Foundation for agent collaboration (future)
+8. **Extensibility** - Easy to add new AI capabilities
+9. **Testability** - Clear abstractions for unit testing
+10. **Modern Architecture** - Following Microsoft's latest recommended practices
+11. **.NET 9 Performance** - Latest framework optimizations
 
 ## Future Enhancements
 
