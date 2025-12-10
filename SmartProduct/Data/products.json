@@ -1,0 +1,101 @@
+[
+  {
+    "id": "P001",
+    "name": "Puppy Starter Food",
+    "category": "Pet Care",
+    "description": "Nutrient-rich dry food formula for dogs 1-6 months supporting growth and immunity",
+    "attributes": { "age_range": "0-6m", "type": "dry food", "size": "small breed" },
+    "price": 14.99,
+    "rating": 4.8,
+    "stock": 120,
+    "tags": ["dog","food","puppy"]
+  },
+  {
+    "id": "P002",
+    "name": "Puppy Growth Vitamins",
+    "category": "Pet Care",
+    "description": "Chewable vitamin supplement with calcium and DHA for developing puppies",
+    "attributes": { "age_range": "0-6m", "form": "chew", "benefit": "bone + brain" },
+    "price": 9.99,
+    "rating": 4.6,
+    "stock": 200,
+    "tags": ["dog","vitamin","puppy"]
+  },
+  {
+    "id": "P003",
+    "name": "Adult Dog Joint Support",
+    "category": "Pet Care",
+    "description": "Joint health supplement for adult and senior dogs with glucosamine",
+    "attributes": { "age_range": "12m+", "benefit": "joint" },
+    "price": 19.50,
+    "rating": 4.4,
+    "stock": 50,
+    "tags": ["dog","supplement","joint"]
+  },
+  {
+    "id": "S001",
+    "name": "Waterproof Hiking Shoes",
+    "category": "Sports",
+    "description": "Lightweight waterproof hiking shoes with deep traction for wet terrain",
+    "attributes": { "use_case": "hiking", "waterproof": true, "weather": "rain" },
+    "price": 89.00,
+    "rating": 4.7,
+    "stock": 35,
+    "tags": ["hiking","shoes","outdoor"]
+  },
+  {
+    "id": "S002",
+    "name": "Compact Trail Backpack",
+    "category": "Sports",
+    "description": "30L hiking backpack with rain cover and breathable back panel",
+    "attributes": { "use_case": "hiking", "capacity_l": 30 },
+    "price": 59.99,
+    "rating": 4.5,
+    "stock": 60,
+    "tags": ["hiking","backpack","outdoor"]
+  },
+  {
+    "id": "S003",
+    "name": "Anti-Blister Hiking Socks",
+    "category": "Sports",
+    "description": "Moisture-wicking cushioned socks reducing friction on long hikes",
+    "attributes": { "use_case": "hiking", "benefit": "comfort" },
+    "price": 12.99,
+    "rating": 4.3,
+    "stock": 140,
+    "tags": ["hiking","socks","outdoor"]
+  },
+  {
+    "id": "G001",
+    "name": "Premium Coffee Gift Set",
+    "category": "Gifts",
+    "description": "Assorted single-origin coffee beans with tasting notes and grinder",
+    "attributes": { "interest": "coffee", "type": "gift" },
+    "price": 49.99,
+    "rating": 4.9,
+    "stock": 25,
+    "tags": ["coffee","gift","beans"]
+  },
+  {
+    "id": "G002",
+    "name": "Pour Over Starter Kit",
+    "category": "Gifts",
+    "description": "Glass dripper, filters, and medium-roast beans for manual brewing",
+    "attributes": { "interest": "coffee", "skill_level": "beginner" },
+    "price": 34.99,
+    "rating": 4.6,
+    "stock": 40,
+    "tags": ["coffee","dripper","gift"]
+  },
+  {
+    "id": "G003",
+    "name": "Insulated Travel Mug",
+    "category": "Gifts",
+    "description": "Leak-proof thermal mug keeping beverages hot for 6 hours",
+    "attributes": { "interest": "coffee", "feature": "thermal" },
+    "price": 24.50,
+    "rating": 4.5,
+    "stock": 80,
+    "tags": ["coffee","mug","gift"]
+  }
+]
